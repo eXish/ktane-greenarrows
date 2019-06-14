@@ -165,39 +165,28 @@ public class GreenArrowsScript : MonoBehaviour {
 
     //twitch plays
     #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} up [Presses the up arrow button] | !{0} right [Presses the right arrow button] | !{0} down [Presses the down arrow button once] | !{0} left [Presses the left arrow button once]";
+    private readonly string TwitchHelpMessage = @"!{0} up [Presses the up arrow button] | !{0} right [Presses the right arrow button] | !{0} down [Presses the down arrow button once] | !{0} left [Presses the left arrow button once] | Words can be substituted as one letter (Ex. right as r)";
     #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
         string[] parameters = command.Split(' ');
+        var buttonsToPress = new List<KMSelectable>();
         foreach (string param in parameters)
         {
-            yield return null;
-            if (param.EqualsIgnoreCase("up"))
-            {
-                buttons[0].OnInteract();
-                break;
-            }
-            else if (param.EqualsIgnoreCase("down"))
-            {
-                buttons[1].OnInteract();
-                break;
-            }
-            else if (param.EqualsIgnoreCase("left"))
-            {
-                buttons[2].OnInteract();
-                break;
-            }
-            else if (param.EqualsIgnoreCase("right"))
-            {
-                buttons[3].OnInteract();
-                break;
-            }
+            if (param.EqualsIgnoreCase("up") || param.EqualsIgnoreCase("u"))
+                buttonsToPress.Add(buttons[0]);
+            else if (param.EqualsIgnoreCase("down") || param.EqualsIgnoreCase("d"))
+                buttonsToPress.Add(buttons[1]);
+            else if (param.EqualsIgnoreCase("left") || param.EqualsIgnoreCase("l"))
+                buttonsToPress.Add(buttons[2]);
+            else if (param.EqualsIgnoreCase("right") || param.EqualsIgnoreCase("r"))
+                buttonsToPress.Add(buttons[3]);
             else
-            {
-                break;
-            }
+                yield break;
         }
+
+        yield return null;
+        yield return buttonsToPress;
     }
 }
