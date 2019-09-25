@@ -19,7 +19,8 @@ public class GreenArrowsScript : MonoBehaviour {
     private int streak = 0;
     private string nextMove;
 
-    private bool isanimating = false;
+    private bool isanimating = true;
+    private bool finalanim = false;
     private bool colorblindActive = false;
 
     static int moduleIdCounter = 1;
@@ -95,7 +96,6 @@ public class GreenArrowsScript : MonoBehaviour {
 
     private IEnumerator generateNewNum()
     {
-        isanimating = true;
         int rando = UnityEngine.Random.RandomRange(0,100);
         if(rando <= 9)
         {
@@ -119,6 +119,7 @@ public class GreenArrowsScript : MonoBehaviour {
 
     private IEnumerator removeNum()
     {
+        isanimating = true;
         yield return new WaitForSeconds(0.5f);
         string num = numDisplay.GetComponent<TextMesh>().text;
         numDisplay.GetComponent<TextMesh>().text = num.Substring(0,1);
@@ -161,6 +162,7 @@ public class GreenArrowsScript : MonoBehaviour {
     private IEnumerator victory()
     {
         isanimating = true;
+        finalanim = true;
         for(int i = 0; i < 100; i++)
         {
             int rand1 = UnityEngine.Random.RandomRange(0, 10);
@@ -177,6 +179,7 @@ public class GreenArrowsScript : MonoBehaviour {
         }
         numDisplay.GetComponent<TextMesh>().text = "GG";
         isanimating = false;
+        finalanim = false;
         moduleSolved = true;
         GetComponent<KMBombModule>().HandlePass();
         StopCoroutine("victory");
@@ -231,5 +234,29 @@ public class GreenArrowsScript : MonoBehaviour {
 
         yield return null;
         yield return buttonsToPress;*/
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        while(streak <= 6)
+        {
+            if (nextMove.Equals("UP"))
+            {
+                yield return ProcessTwitchCommand("up");
+            }
+            else if (nextMove.Equals("DOWN"))
+            {
+                yield return ProcessTwitchCommand("down");
+            }
+            else if (nextMove.Equals("LEFT"))
+            {
+                yield return ProcessTwitchCommand("left");
+            }
+            else if (nextMove.Equals("RIGHT"))
+            {
+                yield return ProcessTwitchCommand("right");
+            }
+            while (isanimating) { yield return true; };
+        }
     }
 }
