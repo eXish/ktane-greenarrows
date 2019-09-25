@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Linq;
 using UnityEngine;
 using KModkit;
@@ -9,12 +10,17 @@ public class GreenArrowsScript : MonoBehaviour {
 
     public KMAudio audio;
     public KMBombInfo bomb;
+    public KMColorblindMode Colorblind;
 
     public KMSelectable[] buttons;
     public GameObject numDisplay;
+    public GameObject colorblindText;
 
     private int streak = 0;
     private string nextMove;
+
+    private bool isanimating = false;
+    private bool colorblindActive = false;
 
     static int moduleIdCounter = 1;
     int moduleId;
@@ -33,11 +39,12 @@ public class GreenArrowsScript : MonoBehaviour {
     void Start () {
         numDisplay.GetComponent<TextMesh>().text = " ";
         StartCoroutine(generateNewNum());
+        StartCoroutine(colorblindDelay());
     }
 
     void PressButton(KMSelectable pressed)
     {
-        if(moduleSolved != true)
+        if(moduleSolved != true && isanimating != true)
         {
             pressed.AddInteractionPunch(0.25f);
             audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, transform);
@@ -88,7 +95,7 @@ public class GreenArrowsScript : MonoBehaviour {
 
     private IEnumerator generateNewNum()
     {
-        yield return null;
+        isanimating = true;
         int rando = UnityEngine.Random.RandomRange(0,100);
         if(rando <= 9)
         {
@@ -106,12 +113,12 @@ public class GreenArrowsScript : MonoBehaviour {
             numDisplay.GetComponent<TextMesh>().text += num.Substring(1,1);
         }
         getNextMove(rando);
+        isanimating = false;
         StopCoroutine("generateNewNum");
     }
 
     private IEnumerator removeNum()
     {
-        yield return null;
         yield return new WaitForSeconds(0.5f);
         string num = numDisplay.GetComponent<TextMesh>().text;
         numDisplay.GetComponent<TextMesh>().text = num.Substring(0,1);
@@ -119,6 +126,17 @@ public class GreenArrowsScript : MonoBehaviour {
         numDisplay.GetComponent<TextMesh>().text = " ";
         StopCoroutine("removeNum");
         Start();
+    }
+
+    private IEnumerator colorblindDelay()
+    {
+        yield return new WaitForSeconds(0.5f);
+        colorblindActive = Colorblind.ColorblindModeActive;
+        if (colorblindActive)
+        {
+            Debug.LogFormat("[Green Arrows #{0}] Colorblind mode is active!", moduleId);
+            colorblindText.SetActive(true);
+        }
     }
 
     private void getNextMove(int i)
@@ -142,7 +160,7 @@ public class GreenArrowsScript : MonoBehaviour {
 
     private IEnumerator victory()
     {
-        yield return null;
+        isanimating = true;
         for(int i = 0; i < 100; i++)
         {
             int rand1 = UnityEngine.Random.RandomRange(0, 10);
@@ -158,19 +176,44 @@ public class GreenArrowsScript : MonoBehaviour {
             yield return new WaitForSeconds(0.025f);
         }
         numDisplay.GetComponent<TextMesh>().text = "GG";
-        StopCoroutine("victory");
-        GetComponent<KMBombModule>().HandlePass();
+        isanimating = false;
         moduleSolved = true;
+        GetComponent<KMBombModule>().HandlePass();
+        StopCoroutine("victory");
     }
 
     //twitch plays
     #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} up [Presses the up arrow button] | !{0} right [Presses the right arrow button] | !{0} down [Presses the down arrow button once] | !{0} left [Presses the left arrow button once] | Words can be substituted as one letter (Ex. right as r)";
+    private readonly string TwitchHelpMessage = @"!{0} up/right/down/left [Presses the specified arrow button] | Words can be substituted as one letter (Ex. right as r)";
     #pragma warning restore 414
 
     IEnumerator ProcessTwitchCommand(string command)
     {
-        string[] parameters = command.Split(' ');
+        if (Regex.IsMatch(command, @"^\s*up\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) || Regex.IsMatch(command, @"^\s*u\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            buttons[0].OnInteract();
+            yield break;
+        }
+        if (Regex.IsMatch(command, @"^\s*down\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) || Regex.IsMatch(command, @"^\s*d\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            buttons[1].OnInteract();
+            yield break;
+        }
+        if (Regex.IsMatch(command, @"^\s*left\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) || Regex.IsMatch(command, @"^\s*l\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            buttons[2].OnInteract();
+            yield break;
+        }
+        if (Regex.IsMatch(command, @"^\s*right\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) || Regex.IsMatch(command, @"^\s*r\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            buttons[3].OnInteract();
+            yield break;
+        }
+        /**string[] parameters = command.Split(' ');
         var buttonsToPress = new List<KMSelectable>();
         foreach (string param in parameters)
         {
@@ -187,6 +230,6 @@ public class GreenArrowsScript : MonoBehaviour {
         }
 
         yield return null;
-        yield return buttonsToPress;
+        yield return buttonsToPress;*/
     }
 }
