@@ -20,7 +20,6 @@ public class GreenArrowsScript : MonoBehaviour {
     private string nextMove;
 
     private bool isanimating = true;
-    private bool finalanim = false;
     private bool colorblindActive = false;
 
     static int moduleIdCounter = 1;
@@ -79,14 +78,14 @@ public class GreenArrowsScript : MonoBehaviour {
             }
             else
             {
-                if(streak == 6)
+                streak++;
+                if (streak == 7)
                 {
                     StartCoroutine(victory());
                     Debug.LogFormat("[Green Arrows #{0}] Streak of 7 reached! Module Disarmed!", moduleId);
                 }
                 else
                 {
-                    streak++;
                     StartCoroutine(removeNum());
                     Debug.LogFormat("[Green Arrows #{0}] '{1}' pressed successfully! Streak is now {2}!", moduleId, nextMove, streak);
                 }
@@ -162,7 +161,6 @@ public class GreenArrowsScript : MonoBehaviour {
     private IEnumerator victory()
     {
         isanimating = true;
-        finalanim = true;
         for(int i = 0; i < 100; i++)
         {
             int rand1 = UnityEngine.Random.RandomRange(0, 10);
@@ -179,7 +177,6 @@ public class GreenArrowsScript : MonoBehaviour {
         }
         numDisplay.GetComponent<TextMesh>().text = "GG";
         isanimating = false;
-        finalanim = false;
         moduleSolved = true;
         GetComponent<KMBombModule>().HandlePass();
         StopCoroutine("victory");
@@ -240,6 +237,7 @@ public class GreenArrowsScript : MonoBehaviour {
     {
         while(streak <= 6)
         {
+            while (isanimating) { yield return new WaitForSeconds(0.1f); };
             if (nextMove.Equals("UP"))
             {
                 yield return ProcessTwitchCommand("up");
@@ -256,7 +254,11 @@ public class GreenArrowsScript : MonoBehaviour {
             {
                 yield return ProcessTwitchCommand("right");
             }
-            while (isanimating) { yield return true; };
+            if(streak == 7)
+            {
+                break;
+            }
         }
+        while (isanimating) { yield return true; };
     }
 }
