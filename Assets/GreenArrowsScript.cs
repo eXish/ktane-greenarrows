@@ -81,7 +81,9 @@ public class GreenArrowsScript : MonoBehaviour {
                 streak++;
                 if (streak == 7)
                 {
+                    moduleSolved = true;
                     StartCoroutine(victory());
+                    Debug.LogFormat("[Green Arrows #{0}] '{1}' pressed successfully! Streak is now {2}!", moduleId, nextMove, streak);
                     Debug.LogFormat("[Green Arrows #{0}] Streak of 7 reached! Module Disarmed!", moduleId);
                 }
                 else
@@ -177,7 +179,6 @@ public class GreenArrowsScript : MonoBehaviour {
         }
         numDisplay.GetComponent<TextMesh>().text = "GG";
         isanimating = false;
-        moduleSolved = true;
         GetComponent<KMBombModule>().HandlePass();
         StopCoroutine("victory");
     }
@@ -193,26 +194,24 @@ public class GreenArrowsScript : MonoBehaviour {
         {
             yield return null;
             buttons[0].OnInteract();
-            yield break;
         }
         if (Regex.IsMatch(command, @"^\s*down\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) || Regex.IsMatch(command, @"^\s*d\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
             buttons[1].OnInteract();
-            yield break;
         }
         if (Regex.IsMatch(command, @"^\s*left\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) || Regex.IsMatch(command, @"^\s*l\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
             buttons[2].OnInteract();
-            yield break;
         }
         if (Regex.IsMatch(command, @"^\s*right\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) || Regex.IsMatch(command, @"^\s*r\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
             yield return null;
             buttons[3].OnInteract();
-            yield break;
         }
+        if (moduleSolved) { yield return "solve"; }
+        yield break;
         /**string[] parameters = command.Split(' ');
         var buttonsToPress = new List<KMSelectable>();
         foreach (string param in parameters)
@@ -237,7 +236,7 @@ public class GreenArrowsScript : MonoBehaviour {
     {
         while(streak <= 6)
         {
-            while (isanimating) { yield return new WaitForSeconds(0.1f); };
+            while (isanimating) { yield return true; yield return new WaitForSeconds(0.1f); };
             if (nextMove.Equals("UP"))
             {
                 yield return ProcessTwitchCommand("up");
@@ -259,6 +258,6 @@ public class GreenArrowsScript : MonoBehaviour {
                 break;
             }
         }
-        while (isanimating) { yield return true; };
+        while (isanimating) { yield return true; yield return new WaitForSeconds(0.1f); };
     }
 }
