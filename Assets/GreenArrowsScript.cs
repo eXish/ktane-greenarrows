@@ -37,12 +37,12 @@ public class GreenArrowsScript : MonoBehaviour {
 
     void Start () {
         numDisplay.GetComponent<TextMesh>().text = " ";
+        number = Random.Range(0, 100);
+        getNextMove(number);
     }
 
     void OnActivate()
     {
-        number = Random.Range(0, 100);
-        getNextMove(number);
         StartCoroutine(showNewNum());
         if (colorblindActive)
             colorblindText.SetActive(true);
