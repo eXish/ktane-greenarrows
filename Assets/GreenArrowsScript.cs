@@ -211,7 +211,7 @@ public class GreenArrowsScript : MonoBehaviour {
     {
         while (streak <= 6)
         {
-            while (isanimating) { yield return true; yield return new WaitForSeconds(0.1f); };
+            while (isanimating) { yield return true; };
             if (nextMove.Equals("UP"))
             {
                 yield return ProcessTwitchCommand("up");
@@ -233,6 +233,6 @@ public class GreenArrowsScript : MonoBehaviour {
                 break;
             }
         }
-        while (isanimating) { yield return true; yield return new WaitForSeconds(0.1f); };
+        while (isanimating) { yield return true; };
     }
 }

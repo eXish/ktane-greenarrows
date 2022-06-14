@@ -927,3 +927,8 @@ td, th {
        (min-resolution: 120dpi) {
     /* Style adjustments for high resolution devices */
 }
+
+/* Hidden table classes */
+.dark td.corner, .dark th.corner, td.corner, th.corner {
+    border: none;
+}
