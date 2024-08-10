@@ -215,6 +215,7 @@ GameObject:
   - component: {fileID: 114576821377466270}
   - component: {fileID: 114137747078870040}
   - component: {fileID: 114034058005544610}
+  - component: {fileID: 114185793935582310}
   m_Layer: 0
   m_Name: GreenArrows
   m_TagString: Untagged
@@ -1274,6 +1275,7 @@ MonoBehaviour:
   audio: {fileID: 114335410585506892}
   bomb: {fileID: 114375059033245494}
   Colorblind: {fileID: 114576821377466270}
+  RuleSeedable: {fileID: 114185793935582310}
   buttons:
   - {fileID: 114804958025998850}
   - {fileID: 114994661812822982}
@@ -1351,6 +1353,18 @@ MonoBehaviour:
   AllowSelectionWrapY: 0
   ForceSelectionHighlight: 0
   ForceInteractionHighlight: 0
+--- !u!114 &114185793935582310
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1371807027823920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adf69c2de51bd3c43bbd9bc22578ee08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _seed: 47
 --- !u!114 &114206445993925112
 MonoBehaviour:
   m_ObjectHideFlags: 1
