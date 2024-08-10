@@ -1,12 +1,15 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using Rnd = UnityEngine.Random;
 
 public class GreenArrowsScript : MonoBehaviour {
 
     public KMAudio audio;
     public KMBombInfo bomb;
     public KMColorblindMode Colorblind;
+    public KMRuleSeedable RuleSeedable;
 
     public KMSelectable[] buttons;
     public GameObject numDisplay;
@@ -18,6 +21,9 @@ public class GreenArrowsScript : MonoBehaviour {
 
     private bool isanimating = true;
     private bool colorblindActive = false;
+
+    private List<int>[] solutions = new List<int>[4] { new List<int>(), new List<int>(), new List<int>(), new List<int>() };
+    private static readonly int[] _seed1Table = new int[100] { 2, 3, 0, 1, 2, 0, 1, 2, 0, 1, 0, 0, 2, 3, 0, 2, 3, 0, 2, 3, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 3, 1, 2, 0, 1, 2, 3, 0, 1, 0, 1, 3, 0, 1, 0, 0, 1, 2, 3, 2, 0, 2, 2, 0, 1, 2, 3, 0, 1, 3, 1, 3, 0, 1, 2, 0, 2, 1, 2, 2, 3, 1, 0, 1, 0, 3, 2, 3, 1, 0, 1, 0, 1, 0, 3, 2, 0, 1, 3, 2, 0, 2, 2, 3, 0, 2, 3, 0, 2, 3 };
 
     static int moduleIdCounter = 1;
     int moduleId;
@@ -36,8 +42,23 @@ public class GreenArrowsScript : MonoBehaviour {
     }
 
     void Start () {
+        var rnd = RuleSeedable.GetRNG();
+        if (rnd.Seed == 1)
+            for (int i = 0; i < 100; i++)
+                solutions[_seed1Table[i]].Add(i);
+        else
+        {
+            Debug.LogFormat("[Green Arrows #{0}] Using rule seed {1}.", moduleId, rnd.Seed);
+            var list = new List<int>();
+            for (int i = 0; i < 100; i++)
+                list.Add(i % 4);
+            rnd.ShuffleFisherYates(list);
+            for (int i = 0; i < 100; i++)
+                solutions[list[i]].Add(i);
+        }
+
         numDisplay.GetComponent<TextMesh>().text = " ";
-        number = Random.Range(0, 100);
+        number = Rnd.Range(0, 100);
         getNextMove(number);
     }
 
@@ -124,7 +145,7 @@ public class GreenArrowsScript : MonoBehaviour {
     private IEnumerator genAndRemoveNum()
     {
         isanimating = true;
-        number = Random.Range(0, 100);
+        number = Rnd.Range(0, 100);
         getNextMove(number);
         yield return new WaitForSeconds(0.5f);
         string num = numDisplay.GetComponent<TextMesh>().text;
@@ -136,22 +157,14 @@ public class GreenArrowsScript : MonoBehaviour {
 
     private void getNextMove(int i)
     {
-        if (i == 10 || i == 50 || i == 90 || i == 39 || i == 79 || i == 28 || i == 8 || i == 17 || i == 37 || i == 57 || i == 97 || i == 86 || i == 25 || i == 45 || i == 65 || i == 5 || i == 14 || i == 44 || i == 74 || i == 94 || i == 33 || i == 53 || i == 83 || i == 22 || i == 42 || i == 62 || i == 72 || i == 2 || i == 11 || i == 81)
-        {
+        if (solutions[0].Contains(i))
             nextMove = "UP";
-        }
-        else if (i == 20 || i == 40 || i == 60 || i == 80 || i == 29 || i == 9 || i == 38 || i == 58 || i == 78 || i == 67 || i == 87 || i == 26 || i == 46 || i == 6 || i == 34 || i == 54 || i == 23 || i == 43 || i == 63 || i == 73 || i == 3 || i == 82 || i == 31 || i == 71)
-        {
+        else if (solutions[1].Contains(i))
             nextMove = "RIGHT";
-        }
-        else if (i == 30 || i == 70 || i == 19 || i == 59 || i == 99 || i == 48 || i == 88 || i == 77 || i == 16 || i == 36 || i == 56 || i == 96 || i == 75 || i == 84 || i == 13 || i == 93 || i == 41 || i == 61 || i == 1)
-        {
-            nextMove = "LEFT";
-        }
-        else
-        {
+        else if (solutions[2].Contains(i))
             nextMove = "DOWN";
-        }
+        else if (solutions[3].Contains(i))
+            nextMove = "LEFT";
         Debug.LogFormat("[Green Arrows #{0}] The number displayed is {1}, the next move should be '{2}'", moduleId, i, nextMove);
     }
 
@@ -160,8 +173,8 @@ public class GreenArrowsScript : MonoBehaviour {
         isanimating = true;
         for (int i = 0; i < 100; i++)
         {
-            int rand1 = Random.Range(0, 10);
-            int rand2 = Random.Range(0, 10);
+            int rand1 = Rnd.Range(0, 10);
+            int rand2 = Rnd.Range(0, 10);
             if (i < 50)
             {
                 numDisplay.GetComponent<TextMesh>().text = rand1 + "" + rand2;
